@@ -1,0 +1,97 @@
+{
+  "listen": "127.0.0.1:8080",
+  "pairs": [
+    {
+      "id": "java-deployment",
+      "description": "Deploy JAR files to application server",
+      "enabled": true,
+      "source": "/home/developer/projects/myapp/build/libs",
+      "target": "/opt/appserver/packages/MyPackage/lib",
+      "includeExtensions": [".jar", ".war"],
+      "excludeGlobs": ["**/*.bak", "**/~*", "**/.tmp"],
+      "syncStrategy": "mtime",
+      "debounceMs": 500,
+      "mirrorDeletes": false,
+      "schedule": {
+        "type": "watcher"
+      },
+      "hooks": [
+        {
+          "matchExtensions": [".jar", ".war"],
+          "http": {
+            "method": "POST",
+            "url": "http://appserver.local:8080/api/reload-package",
+            "headers": {
+              "Authorization": "Bearer YOUR_API_TOKEN_HERE",
+              "Content-Type": "application/json"
+            },
+            "bodyTemplate": "{\"package\":\"MyPackage\",\"file\":\"{{.RelPath}}\",\"timestamp\":\"{{.Timestamp}}\"}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "static-assets-sync",
+      "description": "Sync static web assets with hash verification",
+      "enabled": false,
+      "source": "/var/www/assets/src",
+      "target": "/var/www/assets/dist",
+      "includeExtensions": [".png", ".jpg", ".jpeg", ".gif", ".css", ".js", ".svg"],
+      "excludeGlobs": ["**/node_modules/**", "**/.git/**", "**/*.tmp"],
+      "syncStrategy": "hash",
+      "debounceMs": 300,
+      "mirrorDeletes": true,
+      "schedule": {
+        "type": "interval",
+        "interval": "30m"
+      }
+    },
+    {
+      "id": "config-backup",
+      "description": "Backup configuration files to remote location",
+      "enabled": true,
+      "source": "/etc/myapp/config",
+      "target": "/backup/myapp/config",
+      "includeExtensions": [".conf", ".json", ".xml", ".yaml", ".yml"],
+      "excludeGlobs": ["**/*.log", "**/cache/**"],
+      "syncStrategy": "mtime",
+      "debounceMs": 1000,
+      "mirrorDeletes": false,
+      "schedule": {
+        "type": "cron",
+        "cronExpr": "0 0 2 * * *"
+      },
+      "hooks": [
+        {
+          "matchExtensions": [".conf", ".json", ".xml"],
+          "command": {
+            "executable": "rsync",
+            "args": ["-av", "{{.SourcePath}}", "backup@remote-server:/backups/config/"],
+            "workDir": "/tmp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "development-sync",
+      "description": "Sync development files during work hours",
+      "enabled": false,
+      "source": "/home/developer/workspace/project",
+      "target": "/mnt/shared/development/project",
+      "includeExtensions": [".go", ".js", ".ts", ".html", ".css"],
+      "excludeGlobs": ["**/vendor/**", "**/node_modules/**", "**/.git/**", "**/build/**"],
+      "syncStrategy": "mtime",
+      "debounceMs": 200,
+      "mirrorDeletes": false,
+      "schedule": {
+        "type": "custom",
+        "custom": {
+          "weekDays": [1, 2, 3, 4, 5],
+          "startTime": "08:00",
+          "endTime": "18:00",
+          "interval": "5m"
+        }
+      }
+    }
+  ]
+}

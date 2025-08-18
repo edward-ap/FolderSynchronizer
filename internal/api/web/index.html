@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FolderSynchronizer</title>
+    <link rel="stylesheet" href="/web/styles.css">
+</head>
+<body>
+<!-- ===== TOP NAVIGATION BAR ===== -->
+<div class="topbar">
+    <div class="container row">
+        <div class="brand">
+            <span class="dot"></span>
+            <h1>FolderSynchronizer</h1>
+        </div>
+        <div class="actions">
+            <button id="syncAllBtn" class="btn">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 6V3L8 7l4 4V8c2.8 0 5 2.2 5 5 0 .7-.1 1.4-.4 2l1.9 1.1C19.8 15.1 20 14.1 20 13c0-4.4-3.6-8-8-8zM7.4 9C6.2 10.3 5.5 12 5.5 13.9c0 .7.1 1.4.4 2L4 17c-.6-1.2-1-2.6-1-4.1C3 9.5 6.5 6 11 6v3l4-4-4-4v3C6.6 4 3 7.6 3 12c0 1.6.4 3.1 1.1 4.4l1.8-1.1C5.6 14.6 5.5 13.8 5.5 13c0-1.4.5-2.7 1.4-3.7L7.4 9z"/>
+                </svg>
+                Sync all
+            </button>
+            <button id="newPairBtn" class="btn primary">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/>
+                </svg>
+                New pair
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN CONTENT AREA ===== -->
+<div class="container">
+    <!-- Sync pairs list container -->
+    <div id="syncItems" class="sync-list"></div>
+
+    <!-- User instruction tip -->
+    <div class="tip">
+        Tip: press <span class="kbd">R</span> to refresh list. Click on any row to expand details.
+    </div>
+</div>
+
+<!-- ===== MODAL DIALOG ===== -->
+<div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal">
+        <!-- Modal header -->
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">New Pair</h2>
+            <button class="btn icon-btn" id="closeModal" title="Close">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7l-1.4-1.4L9.2 12 2.9 5.7 4.3 4.3 10.6 10.6 16.9 4.3z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <form id="pairForm">
+                <!-- Tab navigation -->
+                <div class="tabs">
+                    <button class="tab active" type="button" data-tab="basic">Basic Settings</button>
+                    <button class="tab" type="button" data-tab="schedule">Schedule</button>
+                    <button class="tab" type="button" data-tab="hooks">Hooks</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- ===== BASIC SETTINGS TAB ===== -->
+                    <div class="tab-pane active" id="basic-tab">
+                        <div class="form-grid">
+                            <!-- Sync pair identifier -->
+                            <label for="f_id">ID</label>
+                            <input id="f_id" name="id" placeholder="java-jar-deploy" required>
+
+                            <!-- Human-readable description -->
+                            <label for="f_description">Description</label>
+                            <input id="f_description" name="description" placeholder="Automated deployment of JAR files">
+
+                            <!-- Source directory path -->
+                            <label for="f_source">Source directory</label>
+                            <div class="path-input-group">
+                                <input id="f_source" name="source" class="path"
+                                       placeholder="C:\Projects\myapp\build\libs" required>
+                                <button type="button" class="btn folder-btn" onclick="selectFolder('f_source')">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Target directory path -->
+                            <label for="f_target">Target directory</label>
+                            <div class="path-input-group">
+                                <input id="f_target" name="target" class="path"
+                                       placeholder="C:\SoftwareAG\IntegrationServer\instances\default\packages\ISToolbox\code\jars" required>
+                                <button type="button" class="btn folder-btn" onclick="selectFolder('f_target')">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- File extension filters -->
+                            <label for="f_inc">Include extensions (comma)</label>
+                            <input id="f_inc" name="includeExtensions"
+                                   placeholder='Leave blank for all files; e.g. ".jar,.war"'>
+
+                            <!-- Global pattern exclusions -->
+                            <label for="f_exc">Exclude globs (comma)</label>
+                            <input id="f_exc" name="excludeGlobs" placeholder="**/*.bak,**/~*">
+
+                            <!-- Mirror deletion option -->
+                            <label for="f_mirr" class="checkbox-label">Mirror deletes</label>
+                            <div class="checkbox-wrapper">
+                                <input id="f_mirr" name="mirrorDeletes" type="checkbox">
+                                <span class="checkbox-description">
+                                        Delete files in target that don't exist in source
+                                    </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== SCHEDULE CONFIGURATION TAB ===== -->
+                    <div class="tab-pane" id="schedule-tab">
+                        <div class="schedule-section">
+                            <!-- Schedule type selector -->
+                            <div class="schedule-type-selector">
+                                <div class="schedule-type active" data-type="watcher">
+                                    <div class="schedule-type-title">File Watcher</div>
+                                    <div class="schedule-type-desc">Sync on file changes</div>
+                                </div>
+                                <div class="schedule-type" data-type="interval">
+                                    <div class="schedule-type-title">Interval</div>
+                                    <div class="schedule-type-desc">Timed repetition</div>
+                                </div>
+                                <div class="schedule-type" data-type="cron">
+                                    <div class="schedule-type-title">Cron Schedule</div>
+                                    <div class="schedule-type-desc">Advanced timing</div>
+                                </div>
+                                <div class="schedule-type" data-type="custom">
+                                    <div class="schedule-type-title">Custom</div>
+                                    <div class="schedule-type-desc">Complex scheduling</div>
+                                </div>
+                                <div class="schedule-type" data-type="disabled">
+                                    <div class="schedule-type-title">Manual Only</div>
+                                    <div class="schedule-type-desc">No auto sync</div>
+                                </div>
+                            </div>
+
+                            <!-- Interval schedule configuration -->
+                            <div class="schedule-config" id="interval-config">
+                                <div class="form-grid">
+                                    <label>Start Date & Time (optional)</label>
+                                    <input id="schedule-start-datetime" type="datetime-local">
+
+                                    <label>End Date & Time (optional)</label>
+                                    <input id="schedule-end-datetime" type="datetime-local">
+
+                                    <label>Repeat interval (seconds)</label>
+                                    <input id="schedule-interval-seconds" type="number"
+                                           placeholder="900" value="900" min="1">
+
+                                    <label>Repeat after completion</label>
+                                    <div class="checkbox-wrapper">
+                                        <input id="schedule-repeat-after" type="checkbox" checked>
+                                        <span class="checkbox-description">
+                                                Wait for completion before starting next interval
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cron schedule configuration -->
+                            <div class="schedule-config" id="cron-config">
+                                <div class="form-grid">
+                                    <label>Cron expression</label>
+                                    <input id="schedule-cron"
+                                           placeholder='sec min hour day month weekday, e.g. "0 */30 8-20 * * 1-5"'>
+                                </div>
+
+                                <!-- Cron expression examples -->
+                                <div class="schedule-examples">
+                                    <div class="schedule-example" onclick="setScheduleCron('0 */15 * * * *')">
+                                        <div class="example-title">Every 15 minutes</div>
+                                        <div class="example-desc">0 */15 * * * *</div>
+                                    </div>
+                                    <div class="schedule-example" onclick="setScheduleCron('0 0 9 * * *')">
+                                        <div class="example-title">Daily at 9</div>
+                                        <div class="example-desc">0 0 9 * * *</div>
+                                    </div>
+                                    <div class="schedule-example" onclick="setScheduleCron('0 0 9,13,17 * * 1-5')">
+                                        <div class="example-title">Workdays 3 times</div>
+                                        <div class="example-desc">0 0 9,13,17 * * 1-5</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom schedule configuration -->
+                            <div class="schedule-config" id="custom-config">
+                                <div class="form-grid">
+                                    <label>Schedule Type</label>
+                                    <select id="custom-schedule-type">
+                                        <option value="repeating">Repeating (Time-based intervals)</option>
+                                        <option value="fixed">Fixed (Specific times)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Repeating schedule options -->
+                                <div id="repeating-schedule" class="custom-schedule-content">
+                                    <div class="form-grid">
+                                        <label>Week Days</label>
+                                        <div class="weekdays-selector">
+                                            <div class="weekday" data-day="0">Sun</div>
+                                            <div class="weekday active" data-day="1">Mon</div>
+                                            <div class="weekday active" data-day="2">Tue</div>
+                                            <div class="weekday active" data-day="3">Wed</div>
+                                            <div class="weekday active" data-day="4">Thu</div>
+                                            <div class="weekday active" data-day="5">Fri</div>
+                                            <div class="weekday" data-day="6">Sat</div>
+                                        </div>
+
+                                        <label>Time Range & Interval</label>
+                                        <div class="time-inputs">
+                                            <input id="schedule-start-time" type="time"
+                                                   value="08:00" placeholder="Start time">
+                                            <input id="schedule-end-time" type="time"
+                                                   value="20:00" placeholder="End time">
+                                            <input id="schedule-custom-interval"
+                                                   placeholder="1h30m" value="1h30m">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fixed schedule options -->
+                                <div id="fixed-schedule" class="custom-schedule-content" style="display: none;">
+                                    <div class="form-grid">
+                                        <!-- Month selection -->
+                                        <label>Months</label>
+                                        <div class="months-selector">
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-1" value="1">
+                                                <label for="month-1">Jan</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-2" value="2">
+                                                <label for="month-2">Feb</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-3" value="3">
+                                                <label for="month-3">Mar</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-4" value="4">
+                                                <label for="month-4">Apr</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-5" value="5">
+                                                <label for="month-5">May</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-6" value="6">
+                                                <label for="month-6">Jun</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-7" value="7">
+                                                <label for="month-7">Jul</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-8" value="8">
+                                                <label for="month-8">Aug</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-9" value="9">
+                                                <label for="month-9">Sep</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-10" value="10">
+                                                <label for="month-10">Oct</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-11" value="11">
+                                                <label for="month-11">Nov</label>
+                                            </div>
+                                            <div class="month-checkbox">
+                                                <input type="checkbox" id="month-12" value="12">
+                                                <label for="month-12">Dec</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Day of month selection -->
+                                        <label>Days of Month</label>
+                                        <div class="days-selector">
+                                            <!-- Days 1-31 will be generated by JavaScript -->
+                                        </div>
+
+                                        <!-- Weekday selection for fixed schedules -->
+                                        <label>Week Days</label>
+                                        <div class="weekdays-selector fixed-weekdays">
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-0" value="0">
+                                                <label for="fixed-weekday-0">Sun</label>
+                                            </div>
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-1" value="1">
+                                                <label for="fixed-weekday-1">Mon</label>
+                                            </div>
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-2" value="2">
+                                                <label for="fixed-weekday-2">Tue</label>
+                                            </div>
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-3" value="3">
+                                                <label for="fixed-weekday-3">Wed</label>
+                                            </div>
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-4" value="4">
+                                                <label for="fixed-weekday-4">Thu</label>
+                                            </div>
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-5" value="5">
+                                                <label for="fixed-weekday-5">Fri</label>
+                                            </div>
+                                            <div class="weekday-checkbox">
+                                                <input type="checkbox" id="fixed-weekday-6" value="6">
+                                                <label for="fixed-weekday-6">Sat</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Hour selection (0-23) -->
+                                        <label>Hours (0-23)</label>
+                                        <div class="hours-selector">
+                                            <!-- Hours 0-23 will be generated by JavaScript -->
+                                        </div>
+
+                                        <!-- Minute selection -->
+                                        <label>Minutes (0-59)</label>
+                                        <div class="minutes-selector">
+                                            <!-- Common minutes will be generated by JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== HOOKS CONFIGURATION TAB ===== -->
+                    <div class="tab-pane" id="hooks-tab">
+                        <div class="panel-title">
+                            <h3>Hooks (optional)</h3>
+                            <div class="panel-actions">
+                                <button type="button" class="btn" onclick="addHook()">+ Add Hook</button>
+                                <button type="button" class="btn" onclick="showHookExamples()">Examples</button>
+                                <button type="button" class="btn" onclick="testHooks()">Test Hooks</button>
+                            </div>
+                        </div>
+                        <div class="hooks-section">
+                            <!-- Hook configurations will be rendered here by JavaScript -->
+                            <div id="hooksContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal action buttons -->
+        <div class="form-actions">
+            <button type="button" class="btn" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn primary" id="saveBtn" form="pairForm">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST NOTIFICATIONS ===== -->
+<div class="toasts" id="toasts"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="/web/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,846 @@
+/* ===== CSS VARIABLES AND THEMES ===== */
+:root {
+    /* Dark theme (default) */
+    --bg: #0b0f14;
+    --panel: #111821;
+    --elev: #0f1620;
+    --text: #e7edf5;
+    --muted: #afc0d4;
+    --brand: #4da3ff;
+    --brand-2: #7bc6ff;
+    --ok: #3ddc97;
+    --warn: #ffb020;
+    --err: #ff5c5c;
+    --line: #243244;
+    --btn: #182234;
+    --btn-h: #1f2b42;
+    --input: #0e1420;
+    --input-b: #243244;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+/* Light theme */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #f7fafc;
+        --panel: #ffffff;
+        --elev: #ffffff;
+        --text: #0b1020;
+        --muted: #5b6b7d;
+        --brand: #2563eb;
+        --brand-2: #4785ff;
+        --ok: #089e6b;
+        --warn: #b77400;
+        --err: #d12f2f;
+        --line: #e6edf5;
+        --btn: #eef2f7;
+        --btn-h: #e2e8f0;
+        --input: #ffffff;
+        --input-b: #dae3ef;
+        --shadow: 0 10px 25px rgba(0,0,0,.08);
+    }
+}
+
+/* ===== BASE STYLES ===== */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: saturate(150%) blur(6px);
+    background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,0)), var(--bg);
+    border-bottom: 1px solid var(--line);
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+h1 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: .3px;
+}
+
+.brand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.brand .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    border: 1px solid var(--line);
+    background: var(--btn);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    background: var(--btn-h);
+}
+
+.btn.primary {
+    border-color: transparent;
+    background: linear-gradient(180deg, var(--brand), var(--brand-2));
+    color: #fff;
+}
+
+.btn.icon-btn {
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.btn.folder-btn {
+    padding: 8px;
+    border-radius: 8px;
+    margin-left: 8px;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.icon {
+    width: 16px;
+    height: 16px;
+}
+
+.kbd {
+    font-family: ui-monospace, monospace;
+    background: var(--btn);
+    border: 1px solid var(--line);
+    padding: 1px 6px;
+    border-radius: 6px;
+}
+
+.tip {
+    color: var(--muted);
+    margin: 8px 0 24px;
+}
+
+/* ===== SYNC LIST COMPONENTS ===== */
+.sync-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sync-item {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.sync-header {
+    display: grid;
+    grid-template-columns: 24px 1fr auto auto;
+    gap: 12px;
+    padding: 14px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.sync-item.expanded .chevron {
+    transform: rotate(90deg);
+}
+
+.chevron {
+    transition: transform .18s ease;
+}
+
+.status-indicator {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.running {
+    background: var(--ok);
+}
+
+.status-dot.stopped {
+    background: var(--err);
+}
+
+.status-text {
+    font-weight: 600;
+}
+
+.sync-id {
+    font-weight: 600;
+}
+
+.sync-description {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.sync-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.sync-actions .btn {
+    padding: 6px 10px;
+}
+
+.sync-detail {
+    display: none;
+    padding: 16px;
+    border-top: 1px solid var(--line);
+    background: var(--elev);
+}
+
+.sync-item.expanded .sync-detail {
+    display: block;
+}
+
+.detail-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.detail-section {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    padding: 14px;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.detail-field {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.field-label {
+    color: var(--muted);
+}
+
+.field-value.short {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pill {
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--btn);
+    border: 1px solid var(--brand);
+    color: var(--text);
+    font-size: 12px;
+}
+
+/* ===== MODAL ===== */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal {
+    width: min(950px, 95vw);
+    height: min(750px, 90vh);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== TABS ===== */
+.tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 16px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.tab {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    background: var(--btn);
+    color: var(--text);
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    appearance: none;
+    font-weight: 500;
+}
+
+.tab:hover {
+    background: var(--btn-h);
+}
+
+.tab.active {
+    background: linear-gradient(180deg, var(--brand), var(--brand-2));
+    color: #fff;
+    border-color: transparent;
+    border-bottom-color: var(--panel);
+}
+
+.tab:focus-visible {
+    outline: 2px solid #94a3b8;
+    outline-offset: 2px;
+}
+
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* Tab panels container */
+.tabpanes {
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 0 10px 10px 10px;
+    background: var(--panel);
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.tabpane {
+    display: none;
+}
+
+.tabpane.active {
+    display: block;
+}
+
+/* ===== FORMS ===== */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 12px 14px;
+    margin-top: 8px;
+}
+
+label {
+    align-self: center;
+    color: var(--muted);
+}
+
+.checkbox-label {
+    align-self: start;
+    margin-top: 8px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--input-b);
+    background: var(--input);
+    color: var(--text);
+}
+
+input.path {
+    font-family: ui-monospace, monospace;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Path input with folder button */
+.path-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.path-input-group input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: 0;
+}
+
+.path-input-group .folder-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+    margin-left: 0;
+}
+
+/* Checkbox improvements */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.checkbox-description {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* Form actions (sticky footer) */
+.form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding: 16px 32px;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+    margin: 0;
+}
+
+/* ===== SCHEDULE COMPONENTS ===== */
+.schedule-section {
+    background: var(--elev);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.schedule-type-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.schedule-type {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.schedule-type.active {
+    outline: 2px solid var(--brand);
+}
+
+.schedule-type-title {
+    font-weight: 600;
+}
+
+.schedule-type-desc {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.schedule-config {
+    display: none;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--panel);
+}
+
+.schedule-config.active {
+    display: block;
+}
+
+.schedule-examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.schedule-example {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    background: var(--btn);
+}
+
+.schedule-example:hover {
+    background: var(--btn-h);
+}
+
+/* Time selection components */
+.weekdays-selector {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.weekday {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--btn);
+}
+
+.weekday.active {
+    outline: 2px solid var(--brand);
+}
+
+.time-inputs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.custom-schedule-content {
+    margin-top: 16px;
+}
+
+/* Fixed schedule selectors */
+.months-selector {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.month-checkbox, .weekday-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--btn);
+}
+
+.month-checkbox input, .weekday-checkbox input {
+    width: auto;
+    margin: 0;
+}
+
+.month-checkbox label, .weekday-checkbox label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.days-selector {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.day-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--btn);
+    min-width: 40px;
+}
+
+.day-checkbox input {
+    width: auto;
+    margin: 0;
+}
+
+.day-checkbox label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.fixed-weekdays {
+    margin-bottom: 16px;
+}
+
+.fixed-weekdays .weekday-checkbox {
+    min-width: 60px;
+    justify-content: center;
+}
+
+.hours-selector {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.hour-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--btn);
+    min-width: 40px;
+}
+
+.hour-checkbox input {
+    width: auto;
+    margin: 0;
+}
+
+.hour-checkbox label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.minutes-selector {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+}
+
+.minute-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--btn);
+    min-width: 35px;
+}
+
+.minute-checkbox input {
+    width: auto;
+    margin: 0;
+}
+
+.minute-checkbox label {
+    margin: 0;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+/* ===== HOOKS SECTION ===== */
+.panel-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.hooks-section {
+    display: grid;
+    gap: 12px;
+}
+
+.hook {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    overflow: hidden;
+}
+
+.hook-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+.hook-body {
+    padding: 12px 14px;
+    display: grid;
+    gap: 10px;
+}
+
+.hook-type {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.hook-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== HTTP COMPONENTS ===== */
+.http-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.http-inline .method-select {
+    flex: 0 0 110px;
+}
+
+.http-inline .url-input {
+    flex: 1 1 auto;
+}
+
+/* Key/Value table for headers and parameters */
+.kv-table {
+    display: grid;
+    gap: 8px;
+}
+
+.kv-row {
+    display: grid;
+    grid-template-columns: 220px 1fr auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.kv-row .kv-name, .kv-row .kv-val {
+    width: 100%;
+}
+
+/* ===== TOASTS ===== */
+.toasts {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    display: grid;
+    gap: 8px;
+    z-index: 60;
+}
+
+.toast {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+}
+
+.toast.ok {
+    border-color: rgba(61, 220, 151, .4);
+}
+
+.toast.err {
+    border-color: rgba(255, 92, 92, .5);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .detail-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .months-selector {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .days-selector {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .hours-selector {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .minutes-selector {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
