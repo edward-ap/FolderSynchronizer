@@ -1,6 +1,28 @@
 # FolderSynchronizer
 
-A powerful, cross-platform file synchronization tool with web-based management interface, advanced scheduling, and system tray integration.
+**FolderSynchronizer** is a cross-platform file synchronization service with a browser-based management UI, a REST API, and optional Windows system-tray controls. It synchronizes one or more *pairs* of folders using efficient comparison strategies (mtime or SHA-256 hash), real-time change watching, and flexible schedules (interval, cron, or custom time windows). Safety-first file operations (atomic writes), filterable file selection, and robust retry/debounce logic keep syncs reliable even on busy systems.
+
+After each successfully synchronized file, FolderSynchronizer can run **post-sync hooks** that you define per pair. Hooks are filterable by extension or glob and can either:
+- **Call an HTTP webhook** (method, URL, headers, templated body) to notify downstream systems or trigger external automation; or
+- **Execute a local command** (executable + args, working dir, env vars) to kick off scripts, indexers, or any CLI tool.
+  Hook templates expose rich variables (e.g., `RelPath`, `Basename`, `SourcePath`, `TargetPath`, `Timestamp`) so payloads and commands can reference the specific file that changed. Built-in validation and guardrails protect against dangerous commands, and last hook status is tracked for visibility.
+
+Key capabilities:
+- **Sync engine**
+    - Real-time **watcher** mode with fsnotify and debouncing; resilient copy with retries for transient file locks.
+    - **Strategies:** `mtime` (size+time tolerance) and `hash` (SHA-256) to detect real changes.
+    - **Filters:** include by extensions; exclude via doublestar glob patterns; optional mirror deletes.
+    - **Atomic copies** via temp+rename to avoid partial files.
+- **Scheduling**
+    - Modes: *watcher*, fixed *interval*, *cron*, or *custom* windows (start/end times with sub-intervals); *manual* runs supported via API/UI.
+- **Automation & UX**
+    - **Hooks:** HTTP webhooks and local commands with templating, filtering, and retry/error reporting.
+    - **Web UI + REST API** for full management: configure pairs, enable/disable, trigger “Sync All”, inspect status.
+    - **Windows system tray** for quick actions: open UI, sync all, toggle pairs.
+- **Ops-friendly**
+    - JSON config with validation, structured rotating logs, sane defaults, and portable paths.
+
+FolderSynchronizer is designed to be “set-and-forget”: define pairs, choose how and when they run, wire hooks to your pipelines or scripts—and let it keep your targets up to date.
 
 ## ✨ Features
 
